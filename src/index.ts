@@ -22,9 +22,14 @@ export function isChinaUser() {
  *  - 设备特征
  * 三者**全都满足**才判断为中国用户
  *
+ * 如果是 Windows 系统不判断设备特征
+ *
  * 中国大陆、台湾、香港、澳门都视作中国用户
  */
 export function isChinaUserStrict() {
+  if (isWindows()) {
+    return isChinaLanguage({ strict: true }) && isChinaTimeZone();
+  }
   return (
     isChinaLanguage({ strict: true }) && isChinaTimeZone() && isChinaDevice()
   );
@@ -35,13 +40,26 @@ export function isChinaUserStrict() {
  *  - 时区
  *  - 设备特征
  *
+ *  如果是 Windows 系统不判断设备特征
+ *
  *  严格判断简中用户
  * @returns
  */
 export function isChinaUserStrictSimplified() {
+  if (isWindows()) {
+    return (
+      isChinaLanguage({ strict: true, onlySimplified: true }) &&
+      isChinaTimeZone()
+    );
+  }
   return (
-    isChinaLanguage({ onlySimplified: true, strict: true }) &&
+    isChinaLanguage({ strict: true, onlySimplified: true }) &&
     isChinaTimeZone() &&
     isChinaDevice()
   );
+}
+
+/** 判断是否为 Windows 系统 */
+function isWindows(): boolean {
+  return navigator.platform.startsWith("Win");
 }
