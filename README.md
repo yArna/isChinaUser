@@ -1,4 +1,4 @@
-# isChinaDevice 🇨🇳
+# isChinaUser 🇨🇳
 
 检查当前设备是否是中国地区的设备
 

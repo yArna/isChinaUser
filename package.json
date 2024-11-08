@@ -1,7 +1,8 @@
 {
-  "name": "rslib-project",
-  "version": "0.0.0",
+  "name": "is-china-user",
+  "version": "1.0.1",
   "type": "module",
+  "repository": "https://github.com/yArna/isChinaUser",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,11 +18,15 @@
   ],
   "scripts": {
     "build": "rslib build",
-    "dev": "rslib build --watch"
+    "dev": "rslib build --watch",
+    "publish": "npm publish --access public"
   },
   "devDependencies": {
     "@rslib/core": "^0.0.16",
     "@types/node": "^22.8.1",
     "typescript": "^5.6.3"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   }
 }
