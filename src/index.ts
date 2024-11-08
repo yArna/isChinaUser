@@ -10,9 +10,14 @@ export { isChinaDevice, isChinaLanguage, isChinaTimeZone };
  *  - 设备特征
  *  三者**任意满足其一**即判断为中国用户
  *
+ * 如果是 Windows 系统不判断设备特征
+ *
  *  中国大陆、台湾、香港、澳门视作中国用户
  */
 export function isChinaUser() {
+  if (isWindows()) {
+    return isChinaLanguage() || isChinaTimeZone();
+  }
   return isChinaLanguage() || isChinaTimeZone() || isChinaDevice();
 }
 
