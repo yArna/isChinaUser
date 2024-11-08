@@ -31,10 +31,11 @@ export function isChinaUserStrict() {
 }
 
 /** 严格条件下判断当前用户是中国大陆简体中文用户
- *  - 语言（首选语言是中文）
+ *  - 语言（首选语言是简体中文）
  *  - 时区
  *  - 设备特征
  *
+ *  严格判断简中用户
  * @returns
  */
 export function isChinaUserStrictSimplified() {
