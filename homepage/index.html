@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <title>isChinaUser 方法展示</title>
+    <style>
+      /* 通用样式 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: sans-serif;
+        background: linear-gradient(135deg, #e0eafc, #f8fcff);
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .method {
+        margin: 10px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        width: 500px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .method span {
+        width: 250px;
+        font-weight: bold;
+      }
+
+      .method-result {
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 100px;
+        font-size: 14px;
+      }
+
+      .china {
+        background-color: #ffd2d2;
+        color: #ea1010;
+      }
+
+      .non-china {
+        background-color: #d2d8de;
+        color: #293162;
+      }
+      hr {
+        height: 1px;
+        width: 500px;
+        border: none;
+        border: 1px solid #cad5ea;
+        margin: 20px 0;
+        /* width: 100%; */
+      }
+
+      h1 {
+        font-size: 32px;
+        margin: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>isChinaUser 判断当前用户是否是中国用户</h1>
+
+    <div class="method">
+      <span>isChinaDevice:</span>
+      <div id="isChinaDeviceResult" class="method-result"></div>
+    </div>
+    <div class="method">
+      <span>isChinaLanguage:</span>
+      <div id="isChinaLanguageResult" class="method-result"></div>
+    </div>
+    <div class="method">
+      <span>isChinaTimeZone:</span>
+      <div id="isChinaTimeZoneResult" class="method-result"></div>
+    </div>
+
+    <hr />
+
+    <div class="method">
+      <span>isChinaUser:</span>
+      <div id="isChinaUserResult" class="method-result"></div>
+    </div>
+
+    <div class="method">
+      <span>isChinaUserStrictSimplified:</span>
+      <div id="isChinaUserStrictSimplifiedResult" class="method-result"></div>
+    </div>
+
+    <div class="method">
+      <span>isChinaUserStrict:</span>
+      <div id="isChinaUserStrictResult" class="method-result"></div>
+    </div>
+
+    <script type="module">
+      import {
+        isChinaLanguage,
+        isChinaDevice,
+        isChinaTimeZone,
+        isChinaUserStrictSimplified,
+        isChinaUserStrict,
+        isChinaUser,
+      } from "./index.js";
+
+      function displayResult(elementId, result, positiveText, negativeText) {
+        const resultElement = document.getElementById(elementId);
+        if (result) {
+          resultElement.innerText = positiveText;
+          resultElement.classList.add("china");
+        } else {
+          resultElement.innerText = negativeText;
+          resultElement.classList.add("non-china");
+        }
+      }
+
+      window.onload = () => {
+        displayResult(
+          "isChinaLanguageResult",
+          isChinaLanguage(),
+          "🇨🇳 是中国语言",
+          "不是中国语言"
+        );
+        displayResult(
+          "isChinaDeviceResult",
+          isChinaDevice(),
+          "🇨🇳 是中国设备",
+          "不是中国设备"
+        );
+        displayResult(
+          "isChinaTimeZoneResult",
+          isChinaTimeZone(),
+          "🇨🇳 是中国时区",
+          "不是中国时区"
+        );
+        displayResult(
+          "isChinaUserStrictSimplifiedResult",
+          isChinaUserStrictSimplified(),
+          "🇨🇳 是严格简体中国用户",
+          "不是严格简体中国用户"
+        );
+        displayResult(
+          "isChinaUserStrictResult",
+          isChinaUserStrict(),
+          "🇨🇳 是严格中国用户",
+          "不是严格中国用户"
+        );
+        displayResult(
+          "isChinaUserResult",
+          isChinaUser(),
+          "🇨🇳 是中国用户",
+          "不是中国用户"
+        );
+      };
+    </script>
+  </body>
+</html>
