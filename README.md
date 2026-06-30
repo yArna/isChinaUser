@@ -1,4 +1,4 @@
-# isChinaUser
+# 🇨🇳 isChinaUser
 
 判断当前浏览器环境是否更像中国用户 / 中国地区设备。
 
@@ -118,8 +118,8 @@ console.log({ isCNLang, isCST, isEmojiMatch, isFontMatch });
 
 - 这个库是浏览器侧判断，不建议在 Node.js 里直接调用 `isChinaByEmoji()`
 - `isChinaUser()` 偏向“尽量识别”，不是法律意义或身份意义上的严格归类
-- 台湾、香港、澳门在默认语言和时区规则中会被当成正向地区
+- 如果要仅识别中国大陆用户，需要使用 `{ mainland: true }` 参数
 
 ## 示例站点
 
-仓库里的 `docs/` 提供了一个可以直接打开的演示页面，里面会实时展示三种信号和最终结果。
+[https://yarna.github.io/isChinaUser/](https://yarna.github.io/isChinaUser/)
