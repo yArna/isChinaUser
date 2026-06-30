@@ -131,6 +131,21 @@
         line-height: 1.5;
       }
 
+      .emoji-preview {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .emoji-sample {
+        color: var(--ink);
+        font-size: 24px;
+        line-height: 1;
+      }
+
       .badge {
         display: inline-flex;
         align-items: center;
@@ -229,10 +244,9 @@
   <body>
     <main>
       <header>
-        <h1>isChinaUser Demo</h1>
+        <h1>isChinaUser </h1>
         <p class="intro">
-          这个页面直接调用当前 Demo 包导出的新接口，展示语言、时区、Emoji
-          三个信号以及综合判断结果。
+          在浏览器中利用各种信息来源判断用户是否是中国用户 
         </p>
       </header>
 
@@ -268,6 +282,7 @@
             <div>
               <span class="method">isChinaByEmoji()</span>
               <span class="detail">通过国旗 Emoji 渲染差异判断设备特征</span>
+           
             </div>
             <span id="emojiResult" class="badge">...</span>
           </div>
@@ -348,7 +363,7 @@
 
         document.getElementById("overallText").textContent =
           overall === true
-            ? "China user"
+            ? "🇨🇳 China user"
             : overall === false
               ? "Non-China user"
               : "Unknown";
