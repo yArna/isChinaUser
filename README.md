@@ -1,85 +1,125 @@
-# isChinaUser 🇨🇳
+# isChinaUser
 
-检查当前设备是否是中国地区的设备
+判断当前浏览器环境是否更像中国用户 / 中国地区设备。
 
-## 为什么？
+这个库不依赖单一信号，而是组合了三类浏览器特征：
 
-如果你需要在浏览器端识别中国用户或非中国用户以实现不同的逻辑，那么这个库就是为你准备的。
+- 语言信息：`navigator.language` 与 `navigator.languages`
+- 时区信息：`Intl.DateTimeFormat().resolvedOptions().timeZone`
+- 设备特征：通过 Emoji 渲染差异做一个轻量探测
+- 字体信息：检测浏览器可用的常见中文字体
 
+## 安装
 
-单纯用语言信息来判断是目前主流的方法，但这不准确，有些中国用户会使用英文系统，有些非中国用户会使用中文系统。
-如果你需要更严格的判断就需要这个库了。
-
-
-一个使用场景是只对中国用户显示一些内容，而屏蔽海外用户，同时尽可能的让海外的中国用户看到内容（他们可能用着当地语言的系统、时区，这通常很难判断，但我们可以判断它的设备是否是国行的）。
-
-这个库有三个判断来源：
-
-- 语言信息，包括当前首选语言和备选语言(`navigator.language` 和 `navigator.languages`)。
-- 时区信息，中国用户的时区一般是 `Asia/Shanghai` 或者 UTC 偏移为 `+8` 的时区。
-- 设备特征，中国大陆地区的设备有一些字符是没有的如旗帜（`🇹🇼`），通常这很难伪装。（Windows 无论是否是中国设备都不会国旗，所以 Windows 系统无法判断）
-
-## 使用
-
-```node
+```bash
 npm i is-china-user
 ```
 
-```js
-import { isChinaDevice, isChinaUser } from "is-china-user";
+## 使用
 
-console.log(isChinaDevice()); // true or false
-console.log(isChinaUser()); // true or false
+```ts
+import { isChinaUser } from "is-china-user";
+
+// 中国用户
+isChinaUser(); // true
+// 中国大陆用户
+isChinaUser({ mainland: true }); // true
 ```
 
-### 方法
+## API
 
-#### `isChinaUser()`
+### `isChinaByLanguage(options?)`
 
-判断当前用户是中国用户
+判断当前语言设置是否为中文。
 
-- 语言（语言列表任一项出现中文）
-- 时区
-- 设备特征
+默认规则：
 
-三者**任意满足其一**即判断为中国用户
+- `navigator.languages` 中只要任意一项是中文，就返回 `true`
 
-中国大陆、台湾、香港、澳门视作中国用户
+可选参数：
 
-#### `isChinaUserStrict()`
+```ts
+isChinaByLanguage({
+  mainland?: boolean;
+  strict?: boolean;
+});
+```
 
-严格条件下判断当前用户是中国用户
+- `mainland: true` 时，只接受更偏向中国大陆简体环境的语言写法，例如 `zh-CN`、`zh-Hans`
+- `strict: true` 时，只检查首选语言 `navigator.languages[0]`
 
-- 语言（首选语言是中文）
-- 时区
-- 设备特征
+示例：
 
-三者**全都满足**才判断为中国用户
+```ts
+isChinaByLanguage(); // 宽松判断
+isChinaByLanguage({ strict: true }); // 只看首选语言
+isChinaByLanguage({ mainland: true }); // 只认大陆简体倾向
+```
 
-如果是 Windows 系统不判断设备特征
+### `isChinaByTimeZone(options?)`
 
-中国大陆、台湾、香港、澳门视作中国用户
+判断时区是否在中国相关时区内。
 
-#### `isChinaUserStrictSimplified()`
+可选参数：
 
-严格条件下判断当前用户是中国大陆简体中文用户
+```ts
+isChinaByTimeZone({
+  mainland?: boolean;
+});
+```
 
-如果是 Windows 系统不判断设备特征
+- 默认会把大陆和港澳台常见时区都视作正向信号
+- `mainland: true` 时，只认大陆常见时区
+- 如果无法读取 `Intl` 时区，会退回到 `getTimezoneOffset()`，以 `UTC+8` 作为备选判断
 
-- 语言（首选语言是简体中文）
-- 时区
-- 设备特征
+### `isChinaByEmoji()`
 
----
+通过 Emoji 渲染差异判断设备特征。
 
-#### `isChinaDevice()`
+- 返回 `true` 表示更像中国大陆设备
+- 返回 `false` 表示未命中
+- 在 Windows 上返回 `null`，因为国旗 Emoji 的渲染差异不适合作为可靠信号
 
-检查当前设备是否是中国的设备
+### `isChinaByFont()`
 
-#### `isChinaLanguage()`
+检测浏览器是否能使用常见中文字体，例如 `Microsoft YaHei`、`PingFang SC`、`SimSun`、`Noto Sans CJK SC` 等。
 
-检查用户的语言设置是否为中文。
+- 返回 `true` 表示检测到常见中文字体
+- 返回 `false` 表示未命中，或当前环境不支持 canvas 检测
 
-#### `isChinaTimeZone()`
+### `isChinaUser()`
 
-验证当前时间区域是否为中国标准时间。
+综合判断当前用户是否更像中国用户。
+
+它会把语言、时区、Emoji 设备特征、中文字体四类信号做组合判断，只要任意一个信号为正，就返回 `true`。
+
+## 推荐用法
+
+如果你只想快速分流：
+
+```ts
+if (isChinaUser()) {
+  // show China-specific content
+}
+```
+
+如果你想更可控：
+
+```ts
+const isCNLang = isChinaByLanguage({ strict: true });
+const isCST = isChinaByTimeZone();
+const isEmojiMatch = isChinaByEmoji();
+const isFontMatch = isChinaByFont();
+
+console.log({ isCNLang, isCST, isEmojiMatch, isFontMatch });
+```
+
+## 说明
+
+- 这个库是浏览器侧判断，不建议在 Node.js 里直接调用 `isChinaByEmoji()`
+- `isChinaUser()` 偏向“尽量识别”，不是法律意义或身份意义上的严格归类
+- 台湾、香港、澳门在默认语言和时区规则中会被当成正向地区
+
+## 示例站点
+
+仓库里的 `docs/` 提供了一个可以直接打开的演示页面，里面会实时展示三种信号和最终结果。

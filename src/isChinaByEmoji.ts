@@ -1,7 +1,11 @@
-export function isChinaDevice(options?: { detectChar: string }) {
-  let detectChar = options?.detectChar ?? "🇹🇼";
+/** 通过 Emoji 判断当前设备是否是中国大陆用户
+ *  如果 🇹🇼 字符无法显示，说明是中国大陆用户
+ *
+ * 如果是 Windows 环境，不能通过此方法判断，因为 Windows 所有国旗 Emoji 都不支持显示 */
+export function isChinaByEmoji(): boolean | null {
+  if (isWindows()) return null;
+  let detectChar = "🇹🇼";
   let result = getCharColors(detectChar);
-  //   console.log("isChinaDevice result:", result);
   return result.isMono;
 }
 
@@ -49,7 +53,7 @@ function getCharColors(char: string): { colors: number[][]; isMono: boolean } {
 
   // 转换 Set 为二维颜色数组
   const colors = Array.from(colorSet).map((color) =>
-    color.split(",").map(Number)
+    color.split(",").map(Number),
   );
 
   canvas.remove();
@@ -58,4 +62,9 @@ function getCharColors(char: string): { colors: number[][]; isMono: boolean } {
     colors,
     isMono,
   };
+}
+
+/** 判断是否为 Windows 系统 */
+function isWindows(): boolean {
+  return navigator.platform.startsWith("Win");
 }

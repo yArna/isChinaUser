@@ -1,8 +1,9 @@
-import { isChinaDevice } from "./isChinaDevice";
-import { isChinaLanguage } from "./isChinaLanguage";
-import { isChinaTimeZone } from "./isChinaTimeZone";
+import { isChinaByEmoji } from "./isChinaByEmoji";
+import { isChinaByFont } from "./isChinaByFont";
+import { isChinaByLanguage } from "./isChinaByLanguage";
+import { isChinaByTimeZone } from "./isChinaByTimeZone";
 
-export { isChinaDevice, isChinaLanguage, isChinaTimeZone };
+export { isChinaByEmoji, isChinaByFont, isChinaByLanguage, isChinaByTimeZone };
 
 /** 判断当前用户是中国用户
  *  - 语言（语言列表任一项出现中文）
@@ -12,59 +13,26 @@ export { isChinaDevice, isChinaLanguage, isChinaTimeZone };
  *
  * 如果是 Windows 系统不判断设备特征
  *
- *  中国大陆、台湾、香港、澳门视作中国用户
+ * 默认情况中国大陆、台湾、香港、澳门都视作中国用户
+ * 如果要判断
  */
-export function isChinaUser() {
-  if (isWindows()) {
-    return isChinaLanguage() || isChinaTimeZone();
-  }
-  return isChinaLanguage() || isChinaTimeZone() || isChinaDevice();
-}
-
-/** 严格条件下判断当前用户是中国用户
- *  - 语言（首选语言是中文）
- *  - 时区
- *  - 设备特征
- * 三者**全都满足**才判断为中国用户
- *
- * 如果是 Windows 系统不判断设备特征
- *
- * 中国大陆、台湾、香港、澳门都视作中国用户
- */
-export function isChinaUserStrict() {
-  if (isWindows()) {
-    return isChinaLanguage({ strict: true }) && isChinaTimeZone();
-  }
+export function isChinaUser(options?: {
+  /**
+   * 是否严格限制为仅中国大陆
+   * @default false (默认包含台湾、香港、澳门)
+   */
+  mainland?: boolean;
+  /**
+   * 是否仅检查最高优先级的首选语言
+   * 默认只要语言列表出现中文都算中文
+   */
+  strict: true;
+}) {
+ 
   return (
-    isChinaLanguage({ strict: true }) && isChinaTimeZone() && isChinaDevice()
+    isChinaByLanguage() ||
+    isChinaByTimeZone() ||
+    isChinaByEmoji() ||
+    isChinaByFont()
   );
-}
-
-/** 严格条件下判断当前用户是中国大陆简体中文用户
- *  - 语言（首选语言是简体中文）
- *  - 时区
- *  - 设备特征
- *
- *  如果是 Windows 系统不判断设备特征
- *
- *  严格判断简中用户
- * @returns
- */
-export function isChinaUserStrictSimplified() {
-  if (isWindows()) {
-    return (
-      isChinaLanguage({ strict: true, onlySimplified: true }) &&
-      isChinaTimeZone()
-    );
-  }
-  return (
-    isChinaLanguage({ strict: true, onlySimplified: true }) &&
-    isChinaTimeZone() &&
-    isChinaDevice()
-  );
-}
-
-/** 判断是否为 Windows 系统 */
-function isWindows(): boolean {
-  return navigator.platform.startsWith("Win");
-}
+} 

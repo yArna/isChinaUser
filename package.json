@@ -1,6 +1,6 @@
 {
   "name": "is-china-user",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "type": "module",
   "repository": "https://github.com/yArna/isChinaUser",
   "exports": {
@@ -19,6 +19,7 @@
   "scripts": {
     "build": "rslib build",
     "dev": "rslib build --watch",
+    "test": "npm run build && node --test test/isChina.test.js",
     "publish": "npm publish --access public"
   },
   "devDependencies": {

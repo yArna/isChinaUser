@@ -1,172 +1,380 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <title>isChinaUser 方法展示</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>isChinaUser Demo</title>
     <style>
-      /* 通用样式 */
       * {
-        margin: 0;
-        padding: 0;
         box-sizing: border-box;
       }
 
+      :root {
+        --bg: #f6f7f9;
+        --panel: #ffffff;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --red: #d92d20;
+        --green: #067647;
+        --blue: #175cd3;
+        --amber: #b54708;
+      }
+
       body {
-        font-family: sans-serif;
-        background: linear-gradient(135deg, #e0eafc, #f8fcff);
-        color: #333;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+        min-height: 100vh;
         margin: 0;
+        color: var(--ink);
+        font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg);
       }
 
-      .method {
-        margin: 10px;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        width: 500px;
-        display: flex;
-        justify-content: space-between;
+      main {
+        width: min(960px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 40px 0;
       }
 
-      .method span {
-        width: 250px;
-        font-weight: bold;
-      }
-
-      .method-result {
-        padding: 10px 20px;
-        border-radius: 5px;
-        color: #fff;
-        font-weight: bold;
-        border-radius: 100px;
-        font-size: 14px;
-      }
-
-      .china {
-        background-color: #ffd2d2;
-        color: #ea1010;
-      }
-
-      .non-china {
-        background-color: #d2d8de;
-        color: #293162;
-      }
-      hr {
-        height: 1px;
-        width: 500px;
-        border: none;
-        border: 1px solid #cad5ea;
-        margin: 20px 0;
-        /* width: 100%; */
+      header {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 20px;
       }
 
       h1 {
+        margin: 0;
         font-size: 32px;
-        margin: 50px;
+        line-height: 1.2;
+      }
+
+      .intro {
+        max-width: 680px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      }
+
+      .summary {
+        display: grid;
+        align-content: space-between;
+        min-height: 220px;
+        padding: 24px;
+      }
+
+      .summary-label,
+      .section-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .summary-result {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin: 16px 0 10px;
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .summary-note {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .signals {
+        padding: 20px;
+      }
+
+      .signal {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .signal:last-child {
+        border-bottom: 0;
+      }
+
+      .method {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .detail {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-width: 86px;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .badge.yes {
+        color: var(--green);
+        background: #dcfae6;
+      }
+
+      .badge.no {
+        color: var(--red);
+        background: #fee4e2;
+      }
+
+      .badge.null {
+        color: var(--amber);
+        background: #fef0c7;
+      }
+
+      .environment {
+        grid-column: 1 / -1;
+        padding: 20px;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .meta {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: #f8fafc;
+      }
+
+      .meta span {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .meta strong {
+        display: block;
+        overflow-wrap: anywhere;
+        font-size: 14px;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      a {
+        color: var(--blue);
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          width: min(100vw - 20px, 960px);
+          padding: 24px 0;
+        }
+
+        .dashboard,
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .summary {
+          min-height: auto;
+        }
+
+        footer {
+          flex-direction: column;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>isChinaUser 判断当前用户是否是中国用户</h1>
+    <main>
+      <header>
+        <h1>isChinaUser Demo</h1>
+        <p class="intro">
+          这个页面直接调用当前 Demo 包导出的新接口，展示语言、时区、Emoji
+          三个信号以及综合判断结果。
+        </p>
+      </header>
 
-    <div class="method">
-      <span>isChinaDevice:</span>
-      <div id="isChinaDeviceResult" class="method-result"></div>
-    </div>
-    <div class="method">
-      <span>isChinaLanguage:</span>
-      <div id="isChinaLanguageResult" class="method-result"></div>
-    </div>
-    <div class="method">
-      <span>isChinaTimeZone:</span>
-      <div id="isChinaTimeZoneResult" class="method-result"></div>
-    </div>
+      <section class="dashboard">
+        <article class="panel summary">
+          <div>
+            <div class="summary-label">综合判断</div>
+            <div class="summary-result">
+              <span id="overallText">Detecting</span>
+              <span id="overallBadge" class="badge">...</span>
+            </div>
+            <p id="overallNote" class="summary-note"></p>
+          </div>
+        </article>
 
-    <hr />
+        <article class="panel signals">
+          <div class="section-label">信号来源</div>
+          <div class="signal">
+            <div>
+              <span class="method">isChinaByLanguage()</span>
+              <span class="detail">读取 navigator.language / navigator.languages</span>
+            </div>
+            <span id="languageResult" class="badge">...</span>
+          </div>
+          <div class="signal">
+            <div>
+              <span class="method">isChinaByTimeZone()</span>
+              <span class="detail">读取 Intl 时区，必要时回退到 UTC 偏移</span>
+            </div>
+            <span id="timeZoneResult" class="badge">...</span>
+          </div>
+          <div class="signal">
+            <div>
+              <span class="method">isChinaByEmoji()</span>
+              <span class="detail">通过国旗 Emoji 渲染差异判断设备特征</span>
+            </div>
+            <span id="emojiResult" class="badge">...</span>
+          </div>
+          <div class="signal">
+            <div>
+              <span class="method">isChinaByFont()</span>
+              <span class="detail">检测浏览器可用的常见中文字体</span>
+            </div>
+            <span id="fontResult" class="badge">...</span>
+          </div>
+        </article>
 
-    <div class="method">
-      <span>isChinaUser:</span>
-      <div id="isChinaUserResult" class="method-result"></div>
-    </div>
+        <article class="panel environment">
+          <div class="section-label">当前环境</div>
+          <div class="meta-grid">
+            <div class="meta">
+              <span>language</span>
+              <strong id="languageMeta">-</strong>
+            </div>
+            <div class="meta">
+              <span>languages</span>
+              <strong id="languagesMeta">-</strong>
+            </div>
+            <div class="meta">
+              <span>time zone</span>
+              <strong id="timeZoneMeta">-</strong>
+            </div>
+            <div class="meta">
+              <span>platform</span>
+              <strong id="platformMeta">-</strong>
+            </div>
+          </div>
+        </article>
+      </section>
 
-    <div class="method">
-      <span>isChinaUserStrictSimplified:</span>
-      <div id="isChinaUserStrictSimplifiedResult" class="method-result"></div>
-    </div>
+      <footer>
+        <span>Demo script: ./index.js</span>
+        <a href="https://github.com/yArna/isChinaUser" target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      </footer>
+    </main>
 
-    <div class="method">
-      <span>isChinaUserStrict:</span>
-      <div id="isChinaUserStrictResult" class="method-result"></div>
-    </div>
-
-    <div class="repo">
-      <a href="https://github.com/yArna/isChinaUser">Github</a>
-    </div>
-
-    <script type="module">
-      import {
-        isChinaLanguage,
-        isChinaDevice,
-        isChinaTimeZone,
-        isChinaUserStrictSimplified,
-        isChinaUserStrict,
+    <script src="./index.js"></script>
+    <script>
+      const {
+        isChinaByEmoji,
+        isChinaByFont,
+        isChinaByLanguage,
+        isChinaByTimeZone,
         isChinaUser,
-      } from "./index.js";
+      } = window.isChinaUser;
 
-      function displayResult(elementId, result, positiveText, negativeText) {
-        const resultElement = document.getElementById(elementId);
-        if (result) {
-          resultElement.innerText = positiveText;
-          resultElement.classList.add("china");
-        } else {
-          resultElement.innerText = negativeText;
-          resultElement.classList.add("non-china");
-        }
+      const resultText = {
+        true: "Yes",
+        false: "No",
+        null: "N/A",
+      };
+
+      function setBadge(id, result) {
+        const el = document.getElementById(id);
+        el.textContent = resultText[String(result)];
+        el.className = `badge ${
+          result === true ? "yes" : result === false ? "no" : "null"
+        }`;
       }
 
-      window.onload = () => {
-        displayResult(
-          "isChinaLanguageResult",
-          isChinaLanguage(),
-          "🇨🇳 是中国语言",
-          "不是中国语言"
-        );
-        displayResult(
-          "isChinaDeviceResult",
-          isChinaDevice(),
-          "🇨🇳 是中国设备",
-          "不是中国设备"
-        );
-        displayResult(
-          "isChinaTimeZoneResult",
-          isChinaTimeZone(),
-          "🇨🇳 是中国时区",
-          "不是中国时区"
-        );
-        displayResult(
-          "isChinaUserStrictSimplifiedResult",
-          isChinaUserStrictSimplified(),
-          "🇨🇳 是严格简体中国用户",
-          "不是严格简体中国用户"
-        );
-        displayResult(
-          "isChinaUserStrictResult",
-          isChinaUserStrict(),
-          "🇨🇳 是严格中国用户",
-          "不是严格中国用户"
-        );
-        displayResult(
-          "isChinaUserResult",
-          isChinaUser(),
-          "🇨🇳 是中国用户",
-          "不是中国用户"
-        );
-      };
+      function getTimeZone() {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown";
+      }
+
+      function render() {
+        const language = isChinaByLanguage();
+        const timeZone = isChinaByTimeZone();
+        const emoji = isChinaByEmoji();
+        const font = isChinaByFont();
+        const overall = isChinaUser();
+
+        document.getElementById("overallText").textContent =
+          overall === true
+            ? "China user"
+            : overall === false
+              ? "Non-China user"
+              : "Unknown";
+        document.getElementById("overallNote").textContent =
+          overall === true
+            ? "至少一个检测信号命中。"
+            : overall === false
+              ? "当前检测信号均未命中。"
+              : "当前环境下存在无法判断的信号。";
+
+        setBadge("overallBadge", overall);
+        setBadge("languageResult", language);
+        setBadge("timeZoneResult", timeZone);
+        setBadge("emojiResult", emoji);
+        setBadge("fontResult", font);
+
+        document.getElementById("languageMeta").textContent =
+          navigator.language || "Unknown";
+        document.getElementById("languagesMeta").textContent =
+          navigator.languages?.join(", ") || "Unknown";
+        document.getElementById("timeZoneMeta").textContent = getTimeZone();
+        document.getElementById("platformMeta").textContent =
+          navigator.platform || "Unknown";
+      }
+
+      render();
     </script>
   </body>
 </html>
