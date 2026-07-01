@@ -111,7 +111,7 @@ isChinaByFont({
 ```ts
 isChinaByFont();
 isChinaByFont({
-  fontList: ["Microsoft YaHei", "PingFang SC", "HarmonyOS Sans"],
+  fontList: ["HarmonyOS Sans"],
 });
 ```
 
