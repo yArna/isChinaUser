@@ -82,7 +82,7 @@ isChinaByTimeZone({
 
 ### `isChinaByFont()`
 
-检测浏览器是否能使用常见中文字体，例如 `Microsoft YaHei`、`PingFang SC`、`SimSun`、`Noto Sans CJK SC` 等。
+检测浏览器是否能使用常见中文字体，例如 `DengXian`,`FangSong` 等。
 
 - 返回 `true` 表示检测到常见中文字体
 - 返回 `false` 表示未命中，或当前环境不支持 canvas 检测
