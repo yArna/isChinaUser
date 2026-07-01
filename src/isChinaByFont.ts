@@ -11,6 +11,8 @@ export function isChinaByFont(): boolean {
     "小标宋体",
     "仿宋_GB2312",
     "HarmonyOS Sans",
+    "Alibaba PuHuiTi",
+    "Smiley Sans",
   ];
 
   const canvas = document.createElement("canvas");

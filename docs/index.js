@@ -104,7 +104,9 @@
                 "方正小标宋简体",
                 "小标宋体",
                 "仿宋_GB2312",
-                "HarmonyOS Sans"
+                "HarmonyOS Sans",
+                "Alibaba PuHuiTi",
+                "Smiley Sans"
             ];
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
