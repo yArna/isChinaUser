@@ -5,25 +5,12 @@ export function isChinaByFont(): boolean {
   if (typeof document === "undefined") return false;
 
   const chineseFonts = [
-    "Microsoft YaHei",
-    "Microsoft JhengHei",
-    "SimSun",
-    "SimHei",
-    "KaiTi",
+    "DengXian",
     "FangSong",
-    "PingFang SC",
-    "PingFang TC",
-    "PingFang HK",
-    "Hiragino Sans GB",
-    "Heiti SC",
-    "Songti SC",
-    "STHeiti",
-    "STSong",
-    "Noto Sans CJK SC",
-    "Noto Sans CJK TC",
-    "Source Han Sans SC",
-    "Source Han Serif SC",
-    "WenQuanYi Micro Hei",
+    "方正小标宋简体",
+    "小标宋体",
+    "仿宋_GB2312",
+    "HarmonyOS Sans",
   ];
 
   const canvas = document.createElement("canvas");
@@ -36,6 +23,7 @@ export function isChinaByFont(): boolean {
   const result = chineseFonts.some((font) => isFontAvailable(ctx, font));
 
   canvas.remove();
+
   return result;
 }
 
