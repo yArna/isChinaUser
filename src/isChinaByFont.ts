@@ -13,7 +13,6 @@ export const DEFAULT_CHINESE_FONTS = [
   "仿宋_GB2312",
   "HarmonyOS Sans",
   "Alibaba PuHuiTi",
-  "Microsoft YaHei",
   "Smiley Sans",
 ];
 

@@ -1,6 +1,6 @@
 {
   "name": "is-china-user",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "type": "module",
   "repository": "https://github.com/yArna/isChinaUser",
   "exports": {

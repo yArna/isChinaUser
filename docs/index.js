@@ -105,7 +105,6 @@
             "仿宋_GB2312",
             "HarmonyOS Sans",
             "Alibaba PuHuiTi",
-            "Microsoft YaHei",
             "Smiley Sans"
         ];
         function isChinaByFont(options) {
