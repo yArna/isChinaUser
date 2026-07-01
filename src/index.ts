@@ -1,9 +1,15 @@
 import { isChinaByEmoji } from "./isChinaByEmoji";
-import { isChinaByFont } from "./isChinaByFont";
+import { DEFAULT_CHINESE_FONTS, isChinaByFont } from "./isChinaByFont";
 import { isChinaByLanguage } from "./isChinaByLanguage";
 import { isChinaByTimeZone } from "./isChinaByTimeZone";
 
-export { isChinaByEmoji, isChinaByFont, isChinaByLanguage, isChinaByTimeZone };
+export {
+  DEFAULT_CHINESE_FONTS,
+  isChinaByEmoji,
+  isChinaByFont,
+  isChinaByLanguage,
+  isChinaByTimeZone,
+};
 
 /** 判断当前用户是中国用户
  *  - 语言（语言列表任一项出现中文）

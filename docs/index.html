@@ -172,9 +172,37 @@
         background: #fef0c7;
       }
 
+      .font-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .font-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 10px;
+        background: #f8fafc;
+        font-size: 13px;
+      }
+
+      .font-item .badge {
+        min-width: 56px;
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+
       .environment {
         grid-column: 1 / -1;
         padding: 20px;
+      }
+
+      .environment-fonts {
+        margin-top: 16px;
       }
 
       .meta-grid {
@@ -289,7 +317,7 @@
           <div class="signal">
             <div>
               <span class="method">isChinaByFont()</span>
-              <span class="detail">检测浏览器可用的常见中文字体</span>
+              <span class="detail">检测浏览器可用的常见中文字体，下面显示临时逐项结果</span>
             </div>
             <span id="fontResult" class="badge">...</span>
           </div>
@@ -315,6 +343,10 @@
               <strong id="platformMeta">-</strong>
             </div>
           </div>
+          <div class="environment-fonts">
+            <div class="section-label">字体检测</div>
+            <div id="fontList" class="font-list" aria-live="polite"></div>
+          </div>
         </article>
       </section>
 
@@ -326,9 +358,10 @@
       </footer>
     </main>
 
-    <script src="./index.js"></script>
-    <script>
+      <script src="./index.js"></script>
+      <script>
       const {
+        DEFAULT_CHINESE_FONTS,
         isChinaByEmoji,
         isChinaByFont,
         isChinaByLanguage,
@@ -354,11 +387,62 @@
         return Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown";
       }
 
+      function checkFontAvailable(ctx, font) {
+        const baseFonts = ["monospace", "sans-serif", "serif"];
+        const sample = "mmmmmmmmmmlli中文测试";
+
+        return baseFonts.some((baseFont) => {
+          ctx.font = `72px ${baseFont}`;
+          const baseWidth = ctx.measureText(sample).width;
+          ctx.font = `72px "${font}", ${baseFont}`;
+          const fontWidth = ctx.measureText(sample).width;
+
+          return fontWidth !== baseWidth;
+        });
+      }
+
+      function getFontChecks() {
+        if (typeof document === "undefined") {
+          return DEFAULT_CHINESE_FONTS.map((font) => ({ font, available: false }));
+        }
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          canvas.remove();
+          return DEFAULT_CHINESE_FONTS.map((font) => ({ font, available: false }));
+        }
+
+        const results = DEFAULT_CHINESE_FONTS.map((font) => ({
+          font,
+          available: checkFontAvailable(ctx, font),
+        }));
+
+        canvas.remove();
+        return results;
+      }
+
+      function renderFontList(fontChecks) {
+        const list = document.getElementById("fontList");
+        list.innerHTML = fontChecks
+          .map(
+            ({ font, available }) => `
+              <span class="font-item">
+                <strong>${font}</strong>
+                <span class="badge ${available ? "yes" : "no"}">${available ? "Yes" : "No"}</span>
+              </span>
+            `,
+          )
+          .join("");
+      }
+
       function render() {
         const language = isChinaByLanguage();
         const timeZone = isChinaByTimeZone();
         const emoji = isChinaByEmoji();
-        const font = isChinaByFont();
+        const fontChecks = getFontChecks();
+        const font = isChinaByFont({ fontList: DEFAULT_CHINESE_FONTS });
         const overall = isChinaUser();
 
         document.getElementById("overallText").textContent =
@@ -379,6 +463,7 @@
         setBadge("timeZoneResult", timeZone);
         setBadge("emojiResult", emoji);
         setBadge("fontResult", font);
+        renderFontList(fontChecks);
 
         document.getElementById("languageMeta").textContent =
           navigator.language || "Unknown";

@@ -275,6 +275,28 @@ test("isChinaByFont detects available chinese fonts with canvas metrics", () => 
   );
 });
 
+test("isChinaByFont accepts a custom fontList option", () => {
+  withPatchedGlobals(
+    {
+      document: {
+        createElement() {
+          return createFontCanvasStub("Custom Demo Font");
+        },
+      },
+    },
+    () => {
+      assert.equal(
+        isChinaByFont({ fontList: ["Custom Demo Font", "Another Font"] }),
+        true,
+      );
+      assert.equal(
+        isChinaByFont({ fontList: ["Missing Font A", "Missing Font B"] }),
+        false,
+      );
+    },
+  );
+});
+
 test("isChinaUser combines language time zone emoji and font signals", () => {
   withPatchedGlobals(
     {

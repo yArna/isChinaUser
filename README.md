@@ -88,12 +88,32 @@ isChinaByTimeZone({
 - 返回 `false` 表示未命中
 - 在 Windows 上返回 `null`，因为国旗 Emoji 的渲染差异不适合作为可靠信号
 
-### `isChinaByFont()`
+### `isChinaByFont(options?)`
 
-检测浏览器是否能使用常见中文字体，例如 `DengXian`,`FangSong` 等。
+检测浏览器是否能使用常见中文字体，例如 `DengXian`、`FangSong` 等。
+
+可选参数：
+
+```ts
+isChinaByFont({
+  fontList?: string[];
+});
+```
+
+- `fontList` 用来覆盖默认字体列表
+- 适合你想针对特定字体集合做检测，或者在自己的业务里做更细的环境探测
 
 - 返回 `true` 表示检测到常见中文字体
 - 返回 `false` 表示未命中，或当前环境不支持 canvas 检测
+
+示例：
+
+```ts
+isChinaByFont();
+isChinaByFont({
+  fontList: ["Microsoft YaHei", "PingFang SC", "HarmonyOS Sans"],
+});
+```
 
 ### `isChinaUser()`
 
@@ -117,7 +137,9 @@ if (isChinaUser()) {
 const isCNLang = isChinaByLanguage({ strict: true });
 const isCST = isChinaByTimeZone();
 const isEmojiMatch = isChinaByEmoji();
-const isFontMatch = isChinaByFont();
+const isFontMatch = isChinaByFont({
+  fontList: ["Microsoft YaHei", "PingFang SC"],
+});
 
 console.log({ isCNLang, isCST, isEmojiMatch, isFontMatch });
 ```

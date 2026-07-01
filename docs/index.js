@@ -42,6 +42,7 @@
             isChinaByEmoji: ()=>/* reexport */ isChinaByEmoji,
             isChinaUser: ()=>/* binding */ isChinaUser,
             isChinaByFont: ()=>/* reexport */ isChinaByFont,
+            DEFAULT_CHINESE_FONTS: ()=>/* reexport */ DEFAULT_CHINESE_FONTS,
             isChinaByLanguage: ()=>/* reexport */ isChinaByLanguage,
             isChinaByTimeZone: ()=>/* reexport */ isChinaByTimeZone
         });
@@ -96,18 +97,20 @@
         }
         /**
  * 通过浏览器可用中文字体判断是否更像中文用户环境
- */ function isChinaByFont() {
+ */ const DEFAULT_CHINESE_FONTS = [
+            "DengXian",
+            "FangSong",
+            "方正小标宋简体",
+            "小标宋体",
+            "仿宋_GB2312",
+            "HarmonyOS Sans",
+            "Alibaba PuHuiTi",
+            "Microsoft YaHei",
+            "Smiley Sans"
+        ];
+        function isChinaByFont(options) {
             if ("undefined" == typeof document) return false;
-            const chineseFonts = [
-                "DengXian",
-                "FangSong",
-                "方正小标宋简体",
-                "小标宋体",
-                "仿宋_GB2312",
-                "HarmonyOS Sans",
-                "Alibaba PuHuiTi",
-                "Smiley Sans"
-            ];
+            const chineseFonts = (null == options ? void 0 : options.fontList) ?? DEFAULT_CHINESE_FONTS;
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             if (!ctx) return false;
