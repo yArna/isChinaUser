@@ -113,7 +113,7 @@ isChinaByFont({
 ```ts
 isChinaByFont();
 isChinaByFont({
-  fontList: ["Microsoft YaHei", "PingFang SC", "HarmonyOS Sans"],
+  fontList: ["HarmonyOS Sans"],
 });
 ```
 
@@ -140,7 +140,7 @@ const isCNLang = isChinaByLanguage({ strict: true });
 const isCST = isChinaByTimeZone();
 const isEmojiMatch = isChinaByEmoji();
 const isFontMatch = isChinaByFont({
-  fontList: ["Microsoft YaHei", "PingFang SC"],
+  fontList: ["方正黑体"],
 });
 
 console.log({ isCNLang, isCST, isEmojiMatch, isFontMatch });
