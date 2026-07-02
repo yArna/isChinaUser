@@ -187,7 +187,7 @@
  * 默认情况中国大陆、台湾、香港、澳门都视作中国用户
  * 如果要判断
  */ function isChinaUser(options) {
-            return isChinaByLanguage() || isChinaByTimeZone() || isChinaByEmoji() || isChinaByFont();
+            return isChinaByLanguage(options) || isChinaByTimeZone(options) || isChinaByEmoji() || isChinaByFont();
         }
         return __webpack_exports__;
     })());

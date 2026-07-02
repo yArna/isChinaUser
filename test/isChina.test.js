@@ -252,7 +252,7 @@ test("isChinaByFont detects available chinese fonts with canvas metrics", () => 
     {
       document: {
         createElement() {
-          return createEmojiAndFontCanvasStub("Microsoft YaHei");
+          return createEmojiAndFontCanvasStub("DengXian");
         },
       },
     },
@@ -370,12 +370,71 @@ test("isChinaUser combines language time zone emoji and font signals", () => {
       },
       document: {
         createElement() {
-          return createEmojiAndFontCanvasStub("Microsoft YaHei");
+          return createEmojiAndFontCanvasStub("DengXian");
         },
       },
     },
     () => {
       assert.equal(isChinaUser(), true);
+    },
+  );
+});
+
+test("isChinaUser forwards mainland and strict options to language and time zone checks", () => {
+  withPatchedGlobals(
+    {
+      navigator: {
+        language: "en-US",
+        languages: ["en-US", "zh-Hant"],
+        platform: "MacIntel",
+      },
+      Intl: {
+        DateTimeFormat() {
+          return {
+            resolvedOptions() {
+              return { timeZone: "Asia/Taipei" };
+            },
+          };
+        },
+      },
+      document: {
+        createElement() {
+          return createEmojiAndFontCanvasStub("Unavailable Font");
+        },
+      },
+    },
+    () => {
+      assert.equal(isChinaUser(), true);
+      assert.equal(isChinaUser({ mainland: true }), false);
+      assert.equal(isChinaUser({ strict: true }), true);
+    },
+  );
+
+  withPatchedGlobals(
+    {
+      navigator: {
+        language: "en-US",
+        languages: ["en-US", "zh-Hant"],
+        platform: "MacIntel",
+      },
+      Intl: {
+        DateTimeFormat() {
+          return {
+            resolvedOptions() {
+              return { timeZone: "Europe/London" };
+            },
+          };
+        },
+      },
+      document: {
+        createElement() {
+          return createEmojiAndFontCanvasStub("Unavailable Font");
+        },
+      },
+    },
+    () => {
+      assert.equal(isChinaUser(), true);
+      assert.equal(isChinaUser({ strict: true }), false);
     },
   );
 });

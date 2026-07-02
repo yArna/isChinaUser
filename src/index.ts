@@ -29,16 +29,16 @@ export function isChinaUser(options?: {
    */
   mainland?: boolean;
   /**
-   * 是否仅检查最高优先级的首选语言
-   * 默认只要语言列表出现中文都算中文
+   * 更严格的检测：
+   * - 是否仅检查最高优先级的首选语言，默认只要语言列表出现中文都算中文
+   * - 仅已知时区，而不退回到 UTC-8 
    */
-  strict: true;
+  strict?: boolean;
 }) {
- 
   return (
-    isChinaByLanguage() ||
-    isChinaByTimeZone() ||
+    isChinaByLanguage(options) ||
+    isChinaByTimeZone(options) ||
     isChinaByEmoji() ||
     isChinaByFont()
   );
-} 
+}
