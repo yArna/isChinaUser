@@ -101,6 +101,84 @@
         line-height: 1.6;
       }
 
+      .controls {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+
+      .control-grid {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .control {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #f8fafc;
+      }
+
+      .control input {
+        appearance: none;
+        position: relative;
+        flex: none;
+        width: 34px;
+        height: 20px;
+        margin-top: 3px;
+        border: 1px solid #cfd7e3;
+        border-radius: 999px;
+        background: #d7deea;
+        transition:
+          background-color 0.18s ease,
+          border-color 0.18s ease,
+          box-shadow 0.18s ease;
+        cursor: pointer;
+      }
+
+      .control input::after {
+        content: "";
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.18);
+        transition: transform 0.18s ease;
+      }
+
+      .control input:checked {
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+
+      .control input:checked::after {
+        transform: translateX(14px);
+      }
+
+      .control input:focus-visible {
+        outline: 2px solid rgba(23, 92, 211, 0.24);
+        outline-offset: 2px;
+      }
+
+      .control strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+
+      .control span {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
       .signals {
         padding: 20px;
       }
@@ -288,6 +366,25 @@
             </div>
             <p id="overallNote" class="summary-note"></p>
           </div>
+          <div class="controls">
+            <div class="section-label">可选参数</div>
+            <div class="control-grid">
+              <label class="control" for="mainlandToggle">
+                <input id="mainlandToggle" type="checkbox" />
+                <div>
+                  <strong>mainland</strong>
+                  <span>只认中国大陆常见语言/时区写法，台湾、香港、澳门不算在内。</span>
+                </div>
+              </label>
+              <label class="control" for="strictToggle">
+                <input id="strictToggle" type="checkbox" />
+                <div>
+                  <strong>strict</strong>
+                  <span>语言只看首选项，时区遇到未知值时不再回退到 UTC+8。</span>
+                </div>
+              </label>
+            </div>
+          </div>
         </article>
 
         <article class="panel signals">
@@ -369,6 +466,9 @@
         isChinaUser,
       } = window.isChinaUser;
 
+      const mainlandToggle = document.getElementById("mainlandToggle");
+      const strictToggle = document.getElementById("strictToggle");
+
       const resultText = {
         true: "Yes",
         false: "No",
@@ -438,12 +538,16 @@
       }
 
       function render() {
-        const language = isChinaByLanguage();
-        const timeZone = isChinaByTimeZone();
+        const options = {
+          mainland: mainlandToggle.checked,
+          strict: strictToggle.checked,
+        };
+        const language = isChinaByLanguage(options);
+        const timeZone = isChinaByTimeZone(options);
         const emoji = isChinaByEmoji();
         const fontChecks = getFontChecks();
         const font = isChinaByFont({ fontList: DEFAULT_CHINESE_FONTS });
-        const overall = isChinaUser();
+        const overall = isChinaUser(options);
 
         document.getElementById("overallText").textContent =
           overall === true
@@ -473,6 +577,9 @@
         document.getElementById("platformMeta").textContent =
           navigator.platform || "Unknown";
       }
+
+      mainlandToggle.addEventListener("change", render);
+      strictToggle.addEventListener("change", render);
 
       render();
     </script>
