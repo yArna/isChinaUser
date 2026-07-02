@@ -5,6 +5,7 @@ import {
   isChinaByEmoji,
   isChinaByFont,
   isChinaByLanguage,
+  isChinaByNetwork,
   isChinaByTimeZone,
   isChinaUser,
 } from "../dist/index.js";
@@ -38,7 +39,12 @@ function withPatchedGlobals(patches, fn) {
   }
 }
 
-function createCanvasStub(pixels) {
+const COLOR_PIXELS = [255, 0, 0, 255, 0, 255, 0, 255];
+const MONO_PIXELS = [0, 0, 0, 255, 0, 0, 0, 255];
+const EMPTY_PIXELS = [];
+
+function createCanvasStub(pixelsByChar) {
+  let lastChar = "";
   return {
     width: 0,
     height: 0,
@@ -48,9 +54,11 @@ function createCanvasStub(pixels) {
         fillStyle: "",
         textBaseline: "",
         clearRect() {},
-        fillText() {},
+        fillText(char) {
+          lastChar = char;
+        },
         getImageData() {
-          return { data: pixels };
+          return { data: pixelsByChar[lastChar] ?? EMPTY_PIXELS };
         },
       };
     },
@@ -204,19 +212,19 @@ test("isChinaByEmoji returns null on windows and inspects canvas elsewhere", () 
     },
   );
 
+  const macNavigator = {
+    language: "en-US",
+    languages: ["en-US"],
+    platform: "MacIntel",
+  };
+
+  // 对照 Emoji 彩色正常，旗帜渲染为黑白字母 → 大陆设备特征
   withPatchedGlobals(
     {
-      navigator: {
-        language: "en-US",
-        languages: ["en-US"],
-        platform: "MacIntel",
-      },
+      navigator: macNavigator,
       document: {
         createElement() {
-          return createCanvasStub([
-            0, 0, 0, 255,
-            0, 0, 0, 255,
-          ]);
+          return createCanvasStub({ "😀": COLOR_PIXELS, "🇹🇼": MONO_PIXELS });
         },
       },
     },
@@ -225,19 +233,28 @@ test("isChinaByEmoji returns null on windows and inspects canvas elsewhere", () 
     },
   );
 
+  // 对照 Emoji 彩色正常，旗帜完全不渲染 → 大陆设备特征
   withPatchedGlobals(
     {
-      navigator: {
-        language: "en-US",
-        languages: ["en-US"],
-        platform: "MacIntel",
-      },
+      navigator: macNavigator,
       document: {
         createElement() {
-          return createCanvasStub([
-            255, 0, 0, 255,
-            0, 255, 0, 255,
-          ]);
+          return createCanvasStub({ "😀": COLOR_PIXELS, "🇹🇼": EMPTY_PIXELS });
+        },
+      },
+    },
+    () => {
+      assert.equal(isChinaByEmoji(), true);
+    },
+  );
+
+  // 旗帜彩色渲染 → 非大陆设备
+  withPatchedGlobals(
+    {
+      navigator: macNavigator,
+      document: {
+        createElement() {
+          return createCanvasStub({ "😀": COLOR_PIXELS, "🇹🇼": COLOR_PIXELS });
         },
       },
     },
@@ -245,6 +262,129 @@ test("isChinaByEmoji returns null on windows and inspects canvas elsewhere", () 
       assert.equal(isChinaByEmoji(), false);
     },
   );
+
+  // 设备连普通 Emoji 都无法彩色渲染 → 无法判断，返回 null 而不是误报 true
+  withPatchedGlobals(
+    {
+      navigator: macNavigator,
+      document: {
+        createElement() {
+          return createCanvasStub({ "😀": MONO_PIXELS, "🇹🇼": MONO_PIXELS });
+        },
+      },
+    },
+    () => {
+      assert.equal(isChinaByEmoji(), null);
+    },
+  );
+
+  // 画布完全空白（如指纹保护环境）→ 无法判断
+  withPatchedGlobals(
+    {
+      navigator: macNavigator,
+      document: {
+        createElement() {
+          return createCanvasStub({});
+        },
+      },
+    },
+    () => {
+      assert.equal(isChinaByEmoji(), null);
+    },
+  );
+});
+
+test("isChinaByLanguage accepts full BCP 47 mainland tags like zh-Hans-CN", () => {
+  withPatchedGlobals(
+    {
+      navigator: {
+        language: "zh-Hans-CN",
+        languages: ["zh-Hans-CN", "en-US"],
+        platform: "MacIntel",
+      },
+    },
+    () => {
+      assert.equal(isChinaByLanguage({ mainland: true }), true);
+      assert.equal(isChinaByLanguage({ mainland: true, strict: true }), true);
+    },
+  );
+});
+
+test("isChinaByTimeZone recognizes legacy tzdata aliases", () => {
+  const withTimeZone = (timeZone, fn) => {
+    withPatchedGlobals(
+      {
+        Intl: {
+          DateTimeFormat() {
+            return {
+              resolvedOptions() {
+                return { timeZone };
+              },
+            };
+          },
+        },
+      },
+      fn,
+    );
+  };
+
+  withTimeZone("PRC", () => {
+    assert.equal(isChinaByTimeZone(), true);
+    assert.equal(isChinaByTimeZone({ mainland: true }), true);
+  });
+
+  withTimeZone("Hongkong", () => {
+    assert.equal(isChinaByTimeZone(), true);
+    assert.equal(isChinaByTimeZone({ mainland: true }), false);
+  });
+
+  withTimeZone("ROC", () => {
+    assert.equal(isChinaByTimeZone(), true);
+    assert.equal(isChinaByTimeZone({ mainland: true }), false);
+  });
+});
+
+test("isChinaByNetwork distinguishes GFW pattern from offline and open networks", async () => {
+  const originalFetch = Object.getOwnPropertyDescriptor(globalThis, "fetch");
+  const makeFetch = ({ blockedSiteReachable, controlSiteReachable }) => {
+    return (url) => {
+      const reachable = url.includes("gstatic")
+        ? blockedSiteReachable
+        : controlSiteReachable;
+      return reachable
+        ? Promise.resolve({ ok: true })
+        : Promise.reject(new Error("network error"));
+    };
+  };
+
+  try {
+    // 探针可达 → 非大陆网络
+    globalThis.fetch = makeFetch({
+      blockedSiteReachable: true,
+      controlSiteReachable: true,
+    });
+    assert.equal(await isChinaByNetwork(), false);
+
+    // 探针被墙、对照可达 → 典型 GFW 特征
+    globalThis.fetch = makeFetch({
+      blockedSiteReachable: false,
+      controlSiteReachable: true,
+    });
+    assert.equal(await isChinaByNetwork(), true);
+
+    // 全部不可达 → 可能离线，无法判断
+    globalThis.fetch = makeFetch({
+      blockedSiteReachable: false,
+      controlSiteReachable: false,
+    });
+    assert.equal(await isChinaByNetwork(), null);
+  } finally {
+    if (originalFetch) {
+      Object.defineProperty(globalThis, "fetch", originalFetch);
+    } else {
+      delete globalThis.fetch;
+    }
+  }
 });
 
 test("isChinaByFont detects available chinese fonts with canvas metrics", () => {

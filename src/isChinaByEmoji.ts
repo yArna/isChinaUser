@@ -1,15 +1,41 @@
 /** 通过 Emoji 判断当前设备是否是中国大陆用户
- *  如果 🇹🇼 字符无法显示，说明是中国大陆用户
+ *  如果 🇹🇼 字符无法彩色显示（渲染为黑白字母或完全不渲染），说明更像中国大陆设备
+ *
+ *  为了避免误报，会先用 😀 做对照：
+ *  如果设备连普通 Emoji 都无法彩色渲染（如无彩色 Emoji 字体的 Linux、
+ *  开启指纹保护的浏览器），返回 null 表示无法判断，而不是误报为 true
  *
  * 如果是 Windows 环境，不能通过此方法判断，因为 Windows 所有国旗 Emoji 都不支持显示 */
 export function isChinaByEmoji(): boolean | null {
+  if (typeof document === "undefined") return null;
   if (isWindows()) return null;
-  let detectChar = "🇹🇼";
-  let result = getCharColors(detectChar);
-  return result.isMono;
+
+  try {
+    // 对照组：😀 在所有支持彩色 Emoji 的设备上都应渲染为彩色
+    const control = getCharColors("😀");
+    if (control.opaquePixelCount === 0 || control.isMono) {
+      // 设备本身不支持彩色 Emoji 渲染（或 canvas 被指纹保护干扰），无法判断
+      return null;
+    }
+
+    const flag = getCharColors("🇹🇼");
+    if (flag.opaquePixelCount === 0) {
+      // 对照组正常但旗帜完全不渲染 → 系统屏蔽了该 Emoji
+      return true;
+    }
+    // 渲染为黑白（通常是 "TW" 字母回退）→ 系统屏蔽了旗帜图案
+    return flag.isMono;
+  } catch {
+    // canvas 不可用（如某些无头环境）时返回无法判断，而不是抛错
+    return null;
+  }
 }
 
-function getCharColors(char: string): { colors: number[][]; isMono: boolean } {
+function getCharColors(char: string): {
+  colors: number[][];
+  isMono: boolean;
+  opaquePixelCount: number;
+} {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   const fontSize = 100;
@@ -33,6 +59,7 @@ function getCharColors(char: string): { colors: number[][]; isMono: boolean } {
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const colorSet = new Set<string>();
   let isMono = true;
+  let opaquePixelCount = 0;
 
   for (let i = 0; i < imageData.data.length; i += 4) {
     const r = imageData.data[i];
@@ -41,6 +68,7 @@ function getCharColors(char: string): { colors: number[][]; isMono: boolean } {
     const a = imageData.data[i + 3];
 
     if (a > 0) {
+      opaquePixelCount++;
       const color = `${r},${g},${b}`;
       colorSet.add(color);
 
@@ -61,10 +89,13 @@ function getCharColors(char: string): { colors: number[][]; isMono: boolean } {
   return {
     colors,
     isMono,
+    opaquePixelCount,
   };
 }
 
 /** 判断是否为 Windows 系统 */
 function isWindows(): boolean {
-  return navigator.platform.startsWith("Win");
+  if (navigator.platform?.startsWith("Win")) return true;
+  // navigator.platform 已被废弃，部分浏览器可能返回空，回退到 userAgent
+  return /Windows/i.test(navigator.userAgent ?? "");
 }
