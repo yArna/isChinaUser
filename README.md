@@ -27,12 +27,12 @@ isChinaUser({ mainland: true }); // true
 ```
 
 ## 如何避免被判断为中国用户
+
 1. 修改浏览器语言，避免含有中文
 2. 修改操作系统语言，避免含有中文
 3. 修改操作系统时区，选中国相邻的国家和地区（如果选西方有可能根据访问时间和时区内平均时间不一致反而被标记）
 4. 使用纯英文操作系统，避免系统字体库有中文字体
 5. 避免无法显示某些特殊 Emoji，这个最麻烦因为很多情况下跟随设备无法更改，需要修改相关操作系统配置文件。
-
 
 ## API
 
@@ -73,12 +73,14 @@ isChinaByLanguage({ mainland: true }); // 只认大陆简体倾向
 ```ts
 isChinaByTimeZone({
   mainland?: boolean;
+  strict?: boolean;
 });
 ```
 
 - 默认会把大陆和港澳台常见时区都视作正向信号
 - `mainland: true` 时，只认大陆常见时区
 - 如果无法读取 `Intl` 时区，会退回到 `getTimezoneOffset()`，以 `UTC+8` 作为备选判断
+- `strict:true` 时不会退回 `UTC+8` 而必须是已知时区
 
 ### `isChinaByEmoji()`
 

@@ -171,10 +171,14 @@
                     return targetZones.has(timeZone);
                 }
             }
-            // 如果没有 Intl 或无法获取时区，使用 UTC 偏移量判断
-            const offset = new Date().getTimezoneOffset();
-            // 中国标准时间 UTC+8，对应的分钟偏移量为 -480
-            return -480 === offset;
+            if (null == options ? void 0 : options.strict) // 严格模式直接返回 false
+            return false;
+            {
+                // 如果没有 Intl 或无法获取时区，使用 UTC 偏移量判断
+                const offset = new Date().getTimezoneOffset();
+                // 中国标准时间 UTC+8，对应的分钟偏移量为 -480
+                return -480 === offset;
+            }
         }
         /** 判断当前用户是中国用户
  *  - 语言（语言列表任一项出现中文）
