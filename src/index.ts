@@ -1,6 +1,7 @@
 import { isChinaByEmoji } from "./isChinaByEmoji";
 import { DEFAULT_CHINESE_FONTS, isChinaByFont } from "./isChinaByFont";
 import { isChinaByLanguage } from "./isChinaByLanguage";
+import { isChinaByNetwork } from "./isChinaByNetwork";
 import { isChinaByTimeZone } from "./isChinaByTimeZone";
 
 export {
@@ -8,6 +9,7 @@ export {
   isChinaByEmoji,
   isChinaByFont,
   isChinaByLanguage,
+  isChinaByNetwork,
   isChinaByTimeZone,
 };
 

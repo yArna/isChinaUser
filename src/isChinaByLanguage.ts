@@ -14,6 +14,8 @@ export function isChinaByLanguage(options?: {
    */
   strict?: boolean;
 }) {
+  if (typeof navigator === "undefined") return false;
+
   const navigatorLanguage =
     navigator.language || (navigator as any).userLanguage || "en";
 
@@ -21,7 +23,8 @@ export function isChinaByLanguage(options?: {
 
   const isChinese = (lang: string): boolean => {
     if (options?.mainland) {
-      return /^zh(-CN|-Hans)?$/i.test(lang);
+      // 匹配 zh、zh-CN、zh-Hans、zh-Hans-CN（Chrome 等浏览器会输出完整 BCP 47 标签）
+      return /^zh(-Hans)?(-CN)?$/i.test(lang);
     } else {
       return /^zh/i.test(lang);
     }
